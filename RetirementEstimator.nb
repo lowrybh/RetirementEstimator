@@ -1,0 +1,393 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     15028,        383]
+NotebookOptionsPosition[     13092,        340]
+NotebookOutlinePosition[     13513,        357]
+CellTagsIndexPosition[     13470,        354]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Federal Income Tax Functions", "Subsection",
+ CellChangeTimes->{{3.8731958637332687`*^9, 3.8731958807123785`*^9}, {
+   3.8731972683446894`*^9, 3.873197272306632*^9}, 
+   3.873198248327009*^9},ExpressionUUID->"6677e303-877a-4afb-93f1-\
+cd06bf323dd0"],
+
+Cell["Income adjustment functions", "Text",
+ CellChangeTimes->{{3.8731995935567474`*^9, 3.8731996411609917`*^9}, 
+   3.873199673954405*^9},ExpressionUUID->"217d8068-e7ff-47b5-900a-\
+5a6c0f361589"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"AGI", " ", "=", " ", 
+    RowBox[{"Adjusted", " ", "Gross", " ", "Income"}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"agi", "[", 
+      RowBox[{
+      "grossIn_", ",", "kTradDep_", ",", "iraTradDep_", ",", "hsaDep_"}], 
+      "]"}], ":=", 
+     RowBox[{"grossIn", "-", "kTradDep", "-", "iraTradDep", "-", "hsaDep"}]}],
+     ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"MAGI", " ", "=", " ", 
+     RowBox[{"Modified", " ", "AGI"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"magi", "[", 
+      RowBox[{"agi_", ",", "iraTradDep_"}], "]"}], ":=", 
+     RowBox[{"agi", "+", "iraTradDep"}]}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.8731994684458847`*^9, 3.873199513195552*^9}, {
+  3.8731996786036434`*^9, 3.8731996866863656`*^9}, {3.8731998272124414`*^9, 
+  3.873199845095125*^9}},
+ CellLabel->"In[2]:=",ExpressionUUID->"e4d1af29-fe7e-4f9d-9251-152debd40652"],
+
+Cell["\<\
+This function calculates the federal income tax after taking deductions \
+(either standard or itemized).\
+\>", "Text",
+ CellChangeTimes->{{3.873197941440815*^9, 3.8731979640371733`*^9}, {
+  3.8731991940309353`*^9, 3.8731991954444866`*^9}, {3.8732005137687817`*^9, 
+  3.873200521639221*^9}, {3.873620353579007*^9, 
+  3.8736203652153745`*^9}},ExpressionUUID->"b79764a2-d342-493c-9a7a-\
+2fcb800561a6"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"fedIncomeTax", "[", 
+     RowBox[{"agi_", ",", 
+      RowBox[{"itemizedDed_", ":", "0"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"fedTaxBracketBottom", "=", 
+         RowBox[{"{", 
+          RowBox[{
+          "0", ",", "10275", ",", "41775", ",", "89075", ",", "170050", ",", 
+           "215950", ",", "539900"}], "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"fedTaxBracketTop", "=", 
+         RowBox[{"{", 
+          RowBox[{
+          "10275", ",", "41775", ",", "89075", ",", "170050", ",", "215950", 
+           ",", "539900", ",", 
+           SuperscriptBox["10", "12"]}], "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"fedTaxRates", "=", 
+         RowBox[{"{", 
+          RowBox[{
+          "0.1", ",", "0.12", ",", "0.22", ",", "0.24", ",", "0.32", ",", 
+           "0.35", ",", "0.37"}], "}"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"stdDed", " ", "=", " ", "12950"}], ",", 
+        "\[IndentingNewLine]", "incTaxable"}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"incTaxable", "=", 
+        RowBox[{"agi", "-", 
+         RowBox[{"Max", "[", 
+          RowBox[{"stdDed", ",", "itemizedDed"}], "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Map", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"HeavisideTheta", "[", 
+              RowBox[{"incTaxable", "-", "#"}], "]"}], "&"}], ",", 
+            "fedTaxBracketBottom"}], "]"}], "*", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"Map", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Min", "[", 
+                RowBox[{"#", ",", "incTaxable"}], "]"}], "&"}], ",", 
+              "fedTaxBracketTop"}], "]"}], "-", "fedTaxBracketBottom"}], 
+           ")"}]}], ")"}], ".", "fedTaxRates"}]}]}], "\[IndentingNewLine]", 
+     "]"}]}], ";"}], "\[IndentingNewLine]"}]], "Input",
+ CellChangeTimes->{{3.8730878939661183`*^9, 3.8730879088084116`*^9}, {
+  3.87319695747208*^9, 3.8731969635663385`*^9}, {3.8731971980801535`*^9, 
+  3.873197266151935*^9}, {3.8731979005751696`*^9, 3.8731979227095003`*^9}, {
+  3.8731979948725915`*^9, 3.8731980046675606`*^9}, {3.8731984469625697`*^9, 
+  3.873198498439848*^9}, {3.873198553895051*^9, 3.8731986673713303`*^9}, {
+  3.8731991856370316`*^9, 3.873199187007128*^9}, {3.8732005629723883`*^9, 
+  3.873200618975031*^9}, {3.873200660085926*^9, 
+  3.873200703221247*^9}},ExpressionUUID->"87d4c3e1-a9a7-4dbd-9b83-\
+bebbcefc4a73"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["IRA and 401k Constants and Functions", "Subsection",
+ CellChangeTimes->{{3.8731988844305224`*^9, 3.873198902976028*^9}, {
+  3.8732005396347904`*^9, 
+  3.8732005496220613`*^9}},ExpressionUUID->"33c0d3fc-d10f-4b9b-a2a3-\
+bfbe187db4d6"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"iraTotMaxDep", " ", "=", " ", "6000"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kTotMaxDep", " ", "=", " ", "20500"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"iraRothMax", " ", 
+    RowBox[{"Dep", "[", "magi_", "]"}]}], ":=", 
+   RowBox[{"Piecewise", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"6000", ",", 
+        RowBox[{
+         RowBox[{"magi", ">=", "0"}], "&&", 
+         RowBox[{"magi", "<", "129000"}]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"6000", "*", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"144000", "-", "magi"}], ")"}], "/", "15000"}]}], ",", 
+        RowBox[{
+         RowBox[{"magi", ">=", "129000"}], "&&", 
+         RowBox[{"magi", "<", "144000"}]}]}], "}"}]}], "}"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"iraTradDed", "[", 
+    RowBox[{"magi_", ",", "dep_"}], "]"}], ":=", 
+   RowBox[{"Piecewise", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"dep", ",", 
+        RowBox[{"magi", "<=", "68000"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"0.6", "*", "dep"}], ",", 
+        RowBox[{
+         RowBox[{"68000", "<", "magi"}], "&&", 
+         RowBox[{"magi", "<", "78000"}]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", 
+        RowBox[{"magi", ">=", "78000"}]}], "}"}]}], "}"}], "]"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.873061887603716*^9, 3.873061906358508*^9}, {
+   3.873062201570656*^9, 3.8730622286339383`*^9}, {3.873062265971198*^9, 
+   3.87306230347279*^9}, {3.8730623515675316`*^9, 3.87306242298139*^9}, {
+   3.8730625525796585`*^9, 3.8730625546215677`*^9}, {3.8730626322106023`*^9, 
+   3.8730627826380367`*^9}, {3.8730628420646734`*^9, 3.873062903124137*^9}, {
+   3.873062983573742*^9, 3.8730630053399506`*^9}, {3.8730637214165564`*^9, 
+   3.8730637787543316`*^9}, {3.873063834033216*^9, 3.873063838104047*^9}, {
+   3.873064060426848*^9, 3.873064062048686*^9}, {3.873064163312973*^9, 
+   3.8730642570070133`*^9}, 3.87306428788439*^9, {3.8730657959828215`*^9, 
+   3.8730658225566044`*^9}, {3.8730661566579237`*^9, 3.873066175803315*^9}, 
+   3.8730668268735003`*^9, 3.873068637868935*^9, {3.87306867295048*^9, 
+   3.8730687254526415`*^9}, {3.8730687644823*^9, 
+   3.873068772389234*^9}},ExpressionUUID->"8a61995f-447d-4006-a97c-\
+4a99d6325db9"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Simulation", "Section",
+ CellChangeTimes->{{3.8731974720860214`*^9, 
+  3.8731974831561832`*^9}},ExpressionUUID->"38201d50-94ac-4c51-998b-\
+7b284c71271d"],
+
+Cell[CellGroupData[{
+
+Cell["Simulation Parameters", "Subsection",
+ CellChangeTimes->{{3.873197606626726*^9, 
+  3.873197612880322*^9}},ExpressionUUID->"7500f7e4-fadd-4ffb-9993-\
+e123fd7915e6"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"incomeGross", " ", "=", " ", "100000"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"annualReturns", " ", "=", " ", "0.15"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kMatchRate", " ", "=", " ", "0.04"}], ";", 
+  RowBox[{"totalWorkforceYears", " ", "=", " ", "30"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"retirementIncome", " ", "=", " ", "50000"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"savingsRate", " ", "=", " ", "0.2"}], ";"}]}], "Input",
+ CellChangeTimes->{
+  3.873197618097978*^9},ExpressionUUID->"e466c098-df69-4ea4-a2ed-\
+3707186e9f0b"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Run Simulation", "Subsection",
+ CellChangeTimes->{{3.873197620306715*^9, 
+  3.873197639494065*^9}},ExpressionUUID->"824de582-18eb-42d4-86a4-\
+d556b5d4943c"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"balanceLog", " ", "=", " ", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"currRetirementBalance", " ", "=", " ", "0"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"yearsWorked", "=", "0"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"netTaxableIncome", "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"While", "[", 
+  RowBox[{
+   RowBox[{"retirementBalance", ">=", "0"}], ",", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"If", "[", 
+     RowBox[{
+      RowBox[{"yearsWorked", "<=", "totalWorkforceYears"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"tempRate", " ", "=", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"savingsRate", ">", "1"}], ",", 
+          RowBox[{"savingsRate", "/", "incomeGross"}], ",", "savingsRate"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"netDeposit", "=", 
+        RowBox[{"savingsRate", "*", "incomeGross"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"\[CapitalDelta]kMatch", "=", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"savingsRate", ">=", "0.05"}], ",", "0.05", ",", "0"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"\[CapitalDelta]kRoth", "=", "0"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"\[CapitalDelta]kTrad", "=", "0"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"\[CapitalDelta]iraRoth", "=", "0"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"\[CapitalDelta]iraTrad", "=", "0"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"yearsWorked", "+=", "1"}], ";"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Withdraw", " ", "from", " ", "retirement", " ", "accounts"}], 
+       "*)"}], "\[IndentingNewLine]", 
+      RowBox[{
+      "retirementIncome", " ", "=", " ", "\[IndentingNewLine]", 
+       "balanceVec"}]}], "\[IndentingNewLine]", "\[IndentingNewLine]", "]"}], 
+    ";"}]}], "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.8730831342162356`*^9, 3.873083143954588*^9}, {
+   3.8730832541102753`*^9, 3.8730832839214935`*^9}, {3.8730833202854137`*^9, 
+   3.8730834876935744`*^9}, {3.8730836354358006`*^9, 
+   3.8730836741550817`*^9}, {3.873084207619762*^9, 3.8730842094647617`*^9}, {
+   3.873084278858625*^9, 3.8730843250820675`*^9}, {3.8730869055443773`*^9, 
+   3.8730869171801815`*^9}, 3.8730869562141066`*^9, {3.873086991721905*^9, 
+   3.8730870073829684`*^9}, {3.873087088932907*^9, 3.873087127667941*^9}, {
+   3.8730872191578674`*^9, 3.873087236317494*^9}, {3.8730872702784123`*^9, 
+   3.8730872754106708`*^9}, 3.8730873060780635`*^9, {3.8730873602885923`*^9, 
+   3.8730874119630623`*^9}, {3.8730874537614765`*^9, 
+   3.8730875720373383`*^9}, {3.8730876574745164`*^9, 
+   3.8730876657910333`*^9}, {3.873087756228361*^9, 3.8730877686452045`*^9}, {
+   3.8730880814649076`*^9, 3.8730880904737234`*^9}, {3.873088125546043*^9, 
+   3.8730881276938534`*^9}, {3.8730881707101455`*^9, 3.873088171763096*^9}, {
+   3.8730885270746603`*^9, 3.8730885631512117`*^9}, {3.873197016995617*^9, 
+   3.8731970241807585`*^9}, {3.8731974127642765`*^9, 3.8731974295321045`*^9}, 
+   3.8731974623644776`*^9, {3.87319753766086*^9, 3.873197578641389*^9}},
+ EmphasizeSyntaxErrors->
+  True,ExpressionUUID->"3232aae7-c48f-45fb-96a9-e0e1b99cb007"],
+
+Cell[BoxData["netTaxableIncome"], "Output",
+ CellChangeTimes->{3.8731970248390837`*^9},
+ CellLabel->"Out[4]=",ExpressionUUID->"81a7f372-a3d6-4971-98fd-0135aefac2ee"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"HeavisideTheta", "[", "0", "]"}]], "Input",
+ CellLabel->"In[1]:=",ExpressionUUID->"df7936c3-5875-491c-bb37-d3d7c93c103e"],
+
+Cell[BoxData[
+ RowBox[{"HeavisideTheta", "[", "0", "]"}]], "Output",
+ CellChangeTimes->{3.873197031564695*^9, 3.87319706694546*^9},
+ CellLabel->"Out[1]=",ExpressionUUID->"3815cc42-3881-4879-958b-655bbe67d7bc"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1302, 981},
+WindowMargins->{{265, Automatic}, {Automatic, 0}},
+CellContext->Notebook,
+FrontEndVersion->"12.3 for Microsoft Windows (64-bit) (May 11, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"265fec65-88a8-4772-9f5a-9506f07fbac6"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 255, 4, 54, "Subsection",ExpressionUUID->"6677e303-877a-4afb-93f1-cd06bf323dd0"],
+Cell[838, 28, 196, 3, 35, "Text",ExpressionUUID->"217d8068-e7ff-47b5-900a-5a6c0f361589"],
+Cell[1037, 33, 1004, 26, 90, "Input",ExpressionUUID->"e4d1af29-fe7e-4f9d-9251-152debd40652"],
+Cell[2044, 61, 408, 8, 35, "Text",ExpressionUUID->"b79764a2-d342-493c-9a7a-2fcb800561a6"],
+Cell[2455, 71, 2668, 63, 218, "Input",ExpressionUUID->"87d4c3e1-a9a7-4dbd-9b83-bebbcefc4a73"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5160, 139, 239, 4, 54, "Subsection",ExpressionUUID->"33c0d3fc-d10f-4b9b-a2a3-bfbe187db4d6"],
+Cell[5402, 145, 2449, 62, 90, "Input",ExpressionUUID->"8a61995f-447d-4006-a97c-4a99d6325db9"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7888, 212, 159, 3, 67, "Section",ExpressionUUID->"38201d50-94ac-4c51-998b-7b284c71271d"],
+Cell[CellGroupData[{
+Cell[8072, 219, 169, 3, 54, "Subsection",ExpressionUUID->"7500f7e4-fadd-4ffb-9993-e123fd7915e6"],
+Cell[8244, 224, 640, 18, 110, "Input",ExpressionUUID->"e466c098-df69-4ea4-a2ed-3707186e9f0b"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8921, 247, 162, 3, 54, "Subsection",ExpressionUUID->"824de582-18eb-42d4-86a4-d556b5d4943c"],
+Cell[CellGroupData[{
+Cell[9108, 254, 3382, 65, 470, "Input",ExpressionUUID->"3232aae7-c48f-45fb-96a9-e0e1b99cb007"],
+Cell[12493, 321, 165, 2, 33, "Output",ExpressionUUID->"81a7f372-a3d6-4971-98fd-0135aefac2ee"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12695, 328, 145, 2, 29, "Input",ExpressionUUID->"df7936c3-5875-491c-bb37-d3d7c93c103e"],
+Cell[12843, 332, 209, 3, 33, "Output",ExpressionUUID->"3815cc42-3881-4879-958b-655bbe67d7bc"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
